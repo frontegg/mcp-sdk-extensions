@@ -11,18 +11,24 @@ npm install @frontegg/mcp-sdk-extensions @modelcontextprotocol/sdk
 ## Usage
 
 ```ts
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { DPoPTransport } from "@frontegg/mcp-sdk-extensions";
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { DPoPTransport } from '@frontegg/mcp-sdk-extensions';
 
-const transport = new DPoPTransport("https://your-app.mcp-gw.frontegg.com", {
-  redirectUrl: "http://localhost:3000/callback",
-  onAuthorizationUrl: async (url) => {
-    // Open the browser, start a callback server, return the authorization code.
-    // This is entirely up to you — the transport doesn't assume a runtime.
-  },
+const transport = new DPoPTransport('https://your-app.mcp-gw.frontegg.com', {
+	clientMetadata: {
+		client_name: 'my-app',
+		redirect_uris: ['http://localhost:3000/callback'],
+		grant_types: ['authorization_code'],
+		response_types: ['code'],
+		token_endpoint_auth_method: 'none',
+	},
+	onAuthorizationUrl: async (url) => {
+		// Open the browser, start a callback server, return the authorization code.
+		// This is entirely up to you — the transport doesn't assume a runtime.
+	},
 });
 
-const client = new Client({ name: "my-app", version: "1.0.0" });
+const client = new Client({ name: 'my-app', version: '1.0.0' });
 await client.connect(transport);
 
 const { tools } = await client.listTools();
@@ -46,13 +52,12 @@ After `start()` completes, all MCP operations (`listTools`, `callTool`, etc.) ar
 
 ### `new DPoPTransport(serverUrl, options)`
 
-| Parameter | Type | Description |
-|---|---|---|
-| `serverUrl` | `string` | MCP server URL |
-| `options.redirectUrl` | `string` | OAuth redirect URI for the callback |
-| `options.onAuthorizationUrl` | `(url: URL) => Promise<string>` | Called when authorization is needed. Receives the auth URL, must return the authorization code. |
-| `options.clientId` | `string?` | OAuth client ID. Omit to use Dynamic Client Registration. |
-| `options.privateJwk` | `JsonWebKey?` | ES256 private key as JWK. Omit to generate an ephemeral key per session. |
+| Parameter                    | Type                                           | Description                                                                                                                                                                               |
+| ---------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `serverUrl`                  | `string`                                       | MCP server URL                                                                                                                                                                            |
+| `options.clientMetadata`     | `OAuthClientMetadata & { client_id?: string }` | OAuth client metadata. `redirect_uris` is required. Include `client_id` to skip DCR. Uses the SDK's [`OAuthClientMetadata`](https://github.com/modelcontextprotocol/typescript-sdk) type. |
+| `options.onAuthorizationUrl` | `(url: URL) => Promise<string>`                | Called when authorization is needed. Receives the auth URL, must return the authorization code.                                                                                           |
+| `options.privateJwk`         | `JsonWebKey?`                                  | ES256 private key as JWK. Omit to generate an ephemeral key per session.                                                                                                                  |
 
 ### Implements `Transport`
 
