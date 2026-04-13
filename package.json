@@ -1,6 +1,6 @@
 {
   "name": "@frontegg/mcp-sdk-extensions",
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "description": "DPoP transport for MCP SDK",
   "type": "module",
   "exports": "./dist/index.js",
